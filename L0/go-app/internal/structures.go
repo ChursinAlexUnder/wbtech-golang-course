@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"time"
@@ -12,7 +12,7 @@ type Orders struct {
 	Entry              string    `json:"entry"`
 	Delivery           `json:"delivery"`
 	Payment            `json:"payment"`
-	Items              `json:"items"`
+	Items              []Items   `json:"items"`
 	Locale             string    `json:"locale"`
 	Internal_signature string    `json:"internal_signature"`
 	Customer_id        string    `json:"customer_id"`
@@ -52,7 +52,7 @@ type Items struct {
 	Track_number string    `json:"track_number"`
 	Rid          uuid.UUID `json:"rid"`
 	Status       int       `json:"status"`
-	Product      `json:"Product"`
+	Product      `json:"product"`
 }
 
 type Product struct {

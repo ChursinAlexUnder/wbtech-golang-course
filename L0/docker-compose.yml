@@ -17,7 +17,12 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
 
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      
+    healthcheck:
+      test: nc -z kafka 9093 || exit -1
+      interval: 2s
+      retries: 10
+      timeout: 20s
+    
   kafka-ui:
     image: kafbat/kafka-ui:main
     ports:
@@ -27,17 +32,15 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9093
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
   
-  golang-producer:
-    image: golang-producer
-    build:
-      context: .
-      dockerfile: ./producer/Dockerfile
+  go-app:
+    image: go-app
+    build: ./go-app
     ports:
       - 8081:8081
     depends_on:
-      - kafka
       - kafka-ui
 
   
