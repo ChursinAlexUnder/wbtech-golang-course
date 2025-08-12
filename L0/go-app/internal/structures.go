@@ -8,7 +8,7 @@ import (
 
 type Orders struct {
 	Order_uid          uuid.UUID `json:"order_uid"`
-	Track_number       string    `json:"Track_number"`
+	Track_number       string    `json:"track_number"`
 	Entry              string    `json:"entry"`
 	Delivery           `json:"delivery"`
 	Payment            `json:"payment"`

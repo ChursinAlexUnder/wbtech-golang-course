@@ -3,9 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style.css">
+
     <title>Получение информации о заказе</title>
 </head>
 <body>
+    <header>
+        <h1>Получение информации о заказе</h1>
+    </header>
+    <div class="structure-block">
+        <input type="text" id="searchInput" placeholder="Поиск заказа по id...">
+        <button id="searchButton">Искать</button>
+    </div>
+    <div class="answer-block">
+        <div class="info-block">
+            <div class="info-block-title">
+                <h2>Order</h2>
+            </div>
+            <div class="info-block-text">
+                <p class="info-block-text-left">order_uid:</p><p class="info-block-text-right">пусто</p>
+            </div>
+            <div class="info-block-text">
+                <p class="info-block-text-left">track_number:</p><p class="info-block-text-right">пусто</p>
+            </div>
+            <div class="info-block-text">
+                <p class="info-block-text-left">entry:</p><p class="info-block-text-right">пусто</p>
+            </div>
+            <div class="info-block-text">
+                <p class="info-block-text-left">locale:</p><p class="info-block-text-right">пусто</p>
+            </div>
+            <div class="info-block-text">
+                <p class="info-block-text-left">internal_signature:</p><p class="info-block-text-right">пусто</p>
+            </div>
+            <div class="info-block-text">
+                <p class="info-block-text-left">customer_id:</p><p class="info-block-text-right">пусто</p>
+            </div>
+            <div class="info-block-text">
+                <p class="info-block-text-left">delivery_service:</p><p class="info-block-text-right">пусто</p>
+            </div>
+            <div class="info-block-text">
+                <p class="info-block-text-left">shardkey:</p><p class="info-block-text-right">пусто</p>
+            </div>
+            <div class="info-block-text">
+                <p class="info-block-text-left">sm_id:</p><p class="info-block-text-right">пусто</p>
+            </div>
+            <div class="info-block-text">
+                <p class="info-block-text-left">date_created:</p><p class="info-block-text-right">пусто</p>
+            </div>
+            <div class="info-block-text">
+                <p class="info-block-text-left">oof_shard:</p><p class="info-block-text-right">пусто</p>
+            </div>
+        </div>
+        <div class="info-block-container">
+            <div class="info-block-slim">
+                <div class="info-block-title">
+                    <h2>Delivery</h2>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">name:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">phone:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">zip:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">city:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">email:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">address:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">region:</p><p class="info-block-text-right">пусто</p>
+                </div>
+            </div>
+            <div class="info-block-slim">
+                <div class="info-block-title">
+                    <h2>Payment</h2>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">transaction:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">request_id:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">currency:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">provider:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">amount:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">payment_dt:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">bank:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">delivery_cost:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">goods_total:</p><p class="info-block-text-right">пусто</p>
+                </div>
+                <div class="info-block-text">
+                    <p class="info-block-text-left">custom_fee:</p><p class="info-block-text-right">пусто</p>
+                </div>
+            </div>
+        </div>
+        <div class="info-block">
+            <div class="info-block-title">
+                <h2>Items</h2>
+            </div>
+            <table>
+                <tr>
+                    <th>track_number</th>
+                    <th>rid</th>
+                    <th>status</th>
+                </tr>
+                <tr>
+                    <td>пусто</td>
+                    <td>пусто</td>
+                    <td>пусто</td>
+                </tr>
+            </table>
+        </div>
+        <div class="info-block">
+            <div class="info-block-title">
+                <h2>Products</h2>
+            </div>
+            <table>
+                <tr>
+                    <th>chrt_id</th>
+                    <th>price</th>
+                    <th>name</th>
+                    <th>sale</th>
+                    <th>size</th>
+                    <th>total_price</th>
+                    <th>nm_id</th>
+                    <th>brand</th>
+                </tr>
+                <tr>
+                    <td>пусто</td>
+                    <td>пусто</td>
+                    <td>пусто</td>
+                    <td>пусто</td>
+                    <td>пусто</td>
+                    <td>пусто</td>
+                    <td>пусто</td>
+                    <td>пусто</td>
+                </tr>
+            </table>
+        </div>
+    </div>
     
 </body>
 </html>

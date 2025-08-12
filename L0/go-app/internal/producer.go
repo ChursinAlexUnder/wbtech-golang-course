@@ -12,21 +12,21 @@ import (
 )
 
 // Функция для создания topic по переданным параметрам
-func createCustomTopic(topic string, partitions, replicationFactor int) {
+func createCustomTopic(topic string, partitions, replicationFactor int) error {
 	conn, err := kafka.Dial("tcp", "kafka:9093")
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 	defer conn.Close()
 
 	controller, err := conn.Controller()
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 	var controllerConn *kafka.Conn
 	controllerConn, err = kafka.Dial("tcp", net.JoinHostPort(controller.Host, strconv.Itoa(controller.Port)))
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 	defer controllerConn.Close()
 
@@ -40,8 +40,9 @@ func createCustomTopic(topic string, partitions, replicationFactor int) {
 
 	err = controllerConn.CreateTopics(topicConfigs...)
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
+	return nil
 }
 
 // Функция для получения списка имеющихся topic-ов
@@ -83,7 +84,10 @@ func Producer(ctx context.Context, topic string, partitions, replicationFactor i
 				haveTopic = true
 			} else {
 				// Создание кастомного topic
-				createCustomTopic(topic, partitions, replicationFactor)
+				err = createCustomTopic(topic, partitions, replicationFactor)
+				if err != nil {
+					fmt.Printf("Ошибка добавления нового topic: %v\n", err)
+				}
 			}
 		}
 	}

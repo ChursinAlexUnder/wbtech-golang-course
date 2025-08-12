@@ -1,0 +1,146 @@
+body {
+    margin-top: 0;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: rgb(251, 246, 255);
+}
+
+.answer-block {
+    margin-bottom: 4.6vw;
+}
+
+.structure-block, .info-block, .info-block-slim, .info-block-container {
+    display: flex;
+    justify-content: center;
+    border-radius: 1.5vw;
+    flex-wrap: wrap;
+}
+
+.structure-block {
+    width: 75vw;
+    background-color: rgb(234, 198, 255);
+    margin: 0 auto 4.6vw auto;
+    padding: 4vw 0;
+}
+
+.info-block {
+    width: 75vw;
+    background-color: rgb(234, 198, 255);
+    margin: 0 auto 1.5vw auto;
+    padding: 0;
+    flex-direction: column;
+}
+
+.info-block-slim {
+    width: 49%;
+    background-color: rgb(234, 198, 255);
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.info-block-container {
+    width: 75vw;
+    margin: 0 auto 1.5vw auto;
+    gap: 2%;
+}
+
+header {
+    width: 75vw;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 4.6vw auto;
+    background-color: rgb(142, 30, 208);
+    border-radius: 0 0 1.5vw 1.5vw;
+}
+
+h1, h2 {
+    color: white;
+}
+
+h2 {
+    margin: 0.9vw 0;
+}
+
+#searchInput, #searchButton {
+    font-size: 1.45vw;
+}
+
+/* Стиль строки поиска */
+#searchInput {
+    width: 70%;
+    padding: 0.75vw 1.4vw;
+    border: 0.2vw solid rgb(142, 30, 208);
+    border-right: none;
+    border-radius: 0.6vw 0 0 0.6vw;
+    background-color: rgb(251, 246, 255);
+}
+
+#searchInput:focus {
+    background-color: white;
+    outline: none;
+}
+
+/* Стиль кнопки поиска */
+#searchButton {
+    padding: 0.75vw 1.4vw;
+    color: white;
+    background-color: rgb(142, 30, 208);
+    border: 0.2vw solid rgb(142, 30, 208);
+    border-radius: 0 0.6vw 0.6vw 0;
+}
+
+#searchButton:hover {
+    cursor: pointer;
+    background-color: rgb(121, 18, 181);
+}
+
+#searchButton:active {
+    background-color: rgb(164, 45, 233);
+}
+
+.info-block-title {
+    width: 100%;
+    border-radius: 1.5vw 1.5vw 0 0;
+    background-color: rgb(142, 30, 208);
+}
+
+.info-block-text {
+    display: flex;
+    width: 28vw;
+    margin: 0.8vw auto;
+    border-radius: 0.5vw;
+    padding: 0.4vw 0.4vw;
+    background-color: rgb(251, 246, 255);
+    border: 0.2vw solid rgb(142, 30, 208);
+    font-size: 1.3vw;
+}
+
+.info-block-text-left, .info-block-text-right {
+    width: 50%;
+    margin: 0;
+}
+.info-block-text-left{
+    text-align: right;
+    padding-right: 0.3vw;
+}
+.info-block-text-right{
+    text-align: left;
+    padding-left: 0.3vw;
+}
+
+/* Стили таблицы */
+table, th, td {
+    border: 0.2vw solid rgb(142, 30, 208);
+    border-collapse: collapse;
+}
+table {
+    width: 95%;
+    margin: 0.8vw auto;
+}
+
+th {
+    background-color: rgb(142, 30, 208);
+    color: white;
+}
+
+/* НАВЕСТИ НАВЕРХУ В БЛОКАХ ПОРЯДОК!!!! */
