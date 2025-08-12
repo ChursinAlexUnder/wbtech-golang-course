@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
 	"github.com/segmentio/kafka-go"
 )
 
 func Consumer(ctx context.Context) {
-	var order Orders
+	var order database.Orders
 
 	dialer := &kafka.Dialer{
 		Timeout:   20 * time.Second,
