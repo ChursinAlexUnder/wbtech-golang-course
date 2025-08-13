@@ -6,13 +6,21 @@ import (
 	"github.com/google/uuid"
 )
 
+type Answer struct {
+	Orders   Orders
+	Delivery Delivery
+	Payment  Payment
+	Items    []Items
+	Product  []Product
+}
+
 type Orders struct {
 	Order_uid          uuid.UUID `json:"order_uid"`
 	Track_number       string    `json:"track_number"`
 	Entry              string    `json:"entry"`
-	Delivery           `json:"delivery"`
-	Payment            `json:"payment"`
-	Items              []Items   `json:"items"`
+	Delivery_uid       uuid.UUID `json:"delivery_uid"`
+	Payment_uid        uuid.UUID `json:"payment_uid"`
+	Items_rid          uuid.UUID `json:"items_rid"`
 	Locale             string    `json:"locale"`
 	Internal_signature string    `json:"internal_signature"`
 	Customer_id        string    `json:"customer_id"`
@@ -52,7 +60,7 @@ type Items struct {
 	Track_number string    `json:"track_number"`
 	Rid          uuid.UUID `json:"rid"`
 	Status       int       `json:"status"`
-	Product      `json:"product"`
+	Product_id   int       `json:"product_id"`
 }
 
 type Product struct {

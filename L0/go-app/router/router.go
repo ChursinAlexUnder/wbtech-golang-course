@@ -1,14 +1,17 @@
 package router
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 	"path/filepath"
 
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func SetupRouter(pool *pgxpool.Pool) *gin.Engine {
+func SetupRouter(pool *pgxpool.Pool, ctx context.Context) *gin.Engine {
 	// Режим прода и тестирования соответственно (доп. логирование)
 	gin.SetMode(gin.ReleaseMode)
 	// gin.SetMode(gin.DebugMode)
@@ -22,17 +25,26 @@ func SetupRouter(pool *pgxpool.Pool) *gin.Engine {
 	})
 
 	// Отдача основного html файла страницы
-	// frontPath := filepath.Join("..", "frontend")
-	router.GET("/order", func(c *gin.Context) {
+	router.GET("/order/*any", func(c *gin.Context) {
 		c.File(filepath.Join("frontend", "index.html"))
 	})
 
 	// Отдача статики (css, js)
 	router.Static("/static", "frontend")
 
-	// Настройка группы эндпоинтов (в данном случае для одного эндпоинта)
-	// api := router.Group("/order")
+	// Эндпоинт для получения данных по order_uid
+	router.GET("/api/:order_uid", func(c *gin.Context) {
+		order_uid := c.Param("order_uid")
+		answer, err := database.GetOrderByUid(pool, ctx, order_uid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		fmt.Println(answer)
+
+	})
 	{
+
 		// api.GET("/universities", func(c *gin.Context) {
 
 		// 	currentRow, err := strconv.Atoi(c.DefaultQuery("currentrow", "0"))

@@ -37,6 +37,8 @@ func Consumer(ctx context.Context) {
 			if err != nil {
 				fmt.Printf("Ошибка обработки в струкруру сообщения: %v\n", err)
 			} else {
+				// Работа с заполненной переменной струкруры Orders
+
 				fmt.Println(order.Order_uid)
 			}
 			// Коммитим оффсет вручную после обработки
