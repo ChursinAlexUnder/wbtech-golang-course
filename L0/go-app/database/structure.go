@@ -6,21 +6,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type Answer struct {
-	Orders   Orders
-	Delivery Delivery
-	Payment  Payment
-	Items    []Items
-	Product  []Product
-}
-
 type Orders struct {
 	Order_uid          uuid.UUID `json:"order_uid"`
 	Track_number       string    `json:"track_number"`
 	Entry              string    `json:"entry"`
 	Delivery_uid       uuid.UUID `json:"delivery_uid"`
+	Delivery           Delivery  `json:"delivery"`
 	Payment_uid        uuid.UUID `json:"payment_uid"`
-	Items_rid          uuid.UUID `json:"items_rid"`
+	Payment            Payment   `json:"payment"`
+	Items              []Items   `json:"items"`
 	Locale             string    `json:"locale"`
 	Internal_signature string    `json:"internal_signature"`
 	Customer_id        string    `json:"customer_id"`
@@ -56,20 +50,18 @@ type Payment struct {
 }
 
 type Items struct {
-	Items_uid    uuid.UUID `json:"items_uid"`
 	Track_number string    `json:"track_number"`
 	Rid          uuid.UUID `json:"rid"`
 	Status       int       `json:"status"`
-	Product_id   int       `json:"product_id"`
-}
 
-type Product struct {
-	Nm_id       int     `json:"nm_id"`
-	Chrt_id     int     `json:"chrt_id"`
-	Price       float64 `json:"price"`
-	Name        string  `json:"name"`
-	Sale        int     `json:"sale"`
-	Size        string  `json:"size"`
-	Total_price float64 `json:"total_price"`
-	Brand       string  `json:"brand"`
+	// Product
+	Nm_id       int       `json:"nm_id"`
+	Chrt_id     int       `json:"chrt_id"`
+	Price       float64   `json:"price"`
+	Name        string    `json:"name"`
+	Sale        int       `json:"sale"`
+	Size        string    `json:"size"`
+	Total_price float64   `json:"total_price"`
+	Brand       string    `json:"brand"`
+	Order_uid   uuid.UUID `json:"order_uid"`
 }

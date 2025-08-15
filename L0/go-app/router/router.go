@@ -2,7 +2,6 @@ package router
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"path/filepath"
 
@@ -11,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func SetupRouter(pool *pgxpool.Pool, ctx context.Context) *gin.Engine {
+func SetupRouter(ctx context.Context, pool *pgxpool.Pool) *gin.Engine {
 	// Режим прода и тестирования соответственно (доп. логирование)
 	gin.SetMode(gin.ReleaseMode)
 	// gin.SetMode(gin.DebugMode)
@@ -35,12 +34,12 @@ func SetupRouter(pool *pgxpool.Pool, ctx context.Context) *gin.Engine {
 	// Эндпоинт для получения данных по order_uid
 	router.GET("/api/:order_uid", func(c *gin.Context) {
 		order_uid := c.Param("order_uid")
-		answer, err := database.GetOrderByUid(pool, ctx, order_uid)
+		answer, err := database.SelectOrderByUid(ctx, pool, order_uid)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		fmt.Println(answer)
+		c.JSON(http.StatusOK, answer)
 
 	})
 	{

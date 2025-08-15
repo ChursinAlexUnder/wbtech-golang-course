@@ -7,10 +7,11 @@ import (
 	"time"
 
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/segmentio/kafka-go"
 )
 
-func Consumer(ctx context.Context) {
+func Consumer(ctx context.Context, pool *pgxpool.Pool) {
 	var order database.Orders
 
 	dialer := &kafka.Dialer{
@@ -37,9 +38,16 @@ func Consumer(ctx context.Context) {
 			if err != nil {
 				fmt.Printf("Ошибка обработки в струкруру сообщения: %v\n", err)
 			} else {
-				// Работа с заполненной переменной струкруры Orders
+				// Сделать валидацию пришедших данных!!!!!
+				//
 
-				fmt.Println(order.Order_uid)
+				// Вставляем в бд
+				err = database.InsertOrder(ctx, pool, order)
+				if err != nil {
+					fmt.Printf("Ошибка вставки полученных данных из kafka в бд: %v\n", err)
+				} else {
+					fmt.Printf("Новая запись успешно вставлена! Её order_uid: %s\n", order.Order_uid)
+				}
 			}
 			// Коммитим оффсет вручную после обработки
 			err = reader.CommitMessages(ctx, msg)

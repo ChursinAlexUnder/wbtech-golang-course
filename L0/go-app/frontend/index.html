@@ -16,6 +16,7 @@
     <div class="structure-block">
         <input type="text" id="searchInput" placeholder="Поиск заказа по id...">
         <button id="searchButton">Искать</button>
+        <p id="errorMessage" class="error-message">Некорректное значение uid</p>
     </div>
     <div class="answer-block">
         <div class="info-block">
@@ -23,37 +24,37 @@
                 <h2>Order</h2>
             </div>
             <div class="info-block-text">
-                <p class="info-block-text-left">order_uid:</p><p class="info-block-text-right">пусто</p>
+                <p class="info-block-text-left">order_uid:</p><p id="order_uid" class="info-block-text-right">пусто</p>
             </div>
             <div class="info-block-text">
-                <p class="info-block-text-left">track_number:</p><p class="info-block-text-right">пусто</p>
+                <p class="info-block-text-left">track_number:</p><p id="track_number" class="info-block-text-right">пусто</p>
             </div>
             <div class="info-block-text">
-                <p class="info-block-text-left">entry:</p><p class="info-block-text-right">пусто</p>
+                <p class="info-block-text-left">entry:</p><p id="entry" class="info-block-text-right">пусто</p>
             </div>
             <div class="info-block-text">
-                <p class="info-block-text-left">locale:</p><p class="info-block-text-right">пусто</p>
+                <p class="info-block-text-left">locale:</p><p id="locale" class="info-block-text-right">пусто</p>
             </div>
             <div class="info-block-text">
-                <p class="info-block-text-left">internal_signature:</p><p class="info-block-text-right">пусто</p>
+                <p class="info-block-text-left">internal_signature:</p><p id="internal_signature" class="info-block-text-right">пусто</p>
             </div>
             <div class="info-block-text">
-                <p class="info-block-text-left">customer_id:</p><p class="info-block-text-right">пусто</p>
+                <p class="info-block-text-left">customer_id:</p><p id="customer_id" class="info-block-text-right">пусто</p>
             </div>
             <div class="info-block-text">
-                <p class="info-block-text-left">delivery_service:</p><p class="info-block-text-right">пусто</p>
+                <p class="info-block-text-left">delivery_service:</p><p id="delivery_service" class="info-block-text-right">пусто</p>
             </div>
             <div class="info-block-text">
-                <p class="info-block-text-left">shardkey:</p><p class="info-block-text-right">пусто</p>
+                <p class="info-block-text-left">shardkey:</p><p id="shardkey" class="info-block-text-right">пусто</p>
             </div>
             <div class="info-block-text">
-                <p class="info-block-text-left">sm_id:</p><p class="info-block-text-right">пусто</p>
+                <p class="info-block-text-left">sm_id:</p><p id="sm_id" class="info-block-text-right">пусто</p>
             </div>
             <div class="info-block-text">
-                <p class="info-block-text-left">date_created:</p><p class="info-block-text-right">пусто</p>
+                <p class="info-block-text-left">date_created:</p><p id="date_created" class="info-block-text-right">пусто</p>
             </div>
             <div class="info-block-text">
-                <p class="info-block-text-left">oof_shard:</p><p class="info-block-text-right">пусто</p>
+                <p class="info-block-text-left">oof_shard:</p><p id="oof_shard" class="info-block-text-right">пусто</p>
             </div>
         </div>
         <div class="info-block-container">
@@ -62,25 +63,25 @@
                     <h2>Delivery</h2>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">name:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">name:</p><p id="name" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">phone:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">phone:</p><p id="phone" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">zip:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">zip:</p><p id="zip" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">city:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">city:</p><p id="city" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">email:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">email:</p><p id="email" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">address:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">address:</p><p id="address" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">region:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">region:</p><p id="region" class="info-block-text-right">пусто</p>
                 </div>
             </div>
             <div class="info-block-slim">
@@ -88,34 +89,34 @@
                     <h2>Payment</h2>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">transaction:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">transaction:</p><p id="transaction" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">request_id:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">request_id:</p><p id="request_id" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">currency:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">currency:</p><p id="currency" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">provider:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">provider:</p><p id="provider" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">amount:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">amount:</p><p id="amount" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">payment_dt:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">payment_dt:</p><p id="payment_dt" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">bank:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">bank:</p><p id="bank" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">delivery_cost:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">delivery_cost:</p><p id="delivery_cost" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">goods_total:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">goods_total:</p><p id="goods_total" class="info-block-text-right">пусто</p>
                 </div>
                 <div class="info-block-text">
-                    <p class="info-block-text-left">custom_fee:</p><p class="info-block-text-right">пусто</p>
+                    <p class="info-block-text-left">custom_fee:</p><p id="custom_fee" class="info-block-text-right">пусто</p>
                 </div>
             </div>
         </div>
@@ -123,11 +124,11 @@
             <div class="info-block-title">
                 <h2>Items</h2>
             </div>
-            <table>
+            <table id="tableItems">
                 <tr>
-                    <th>track_number</th>
-                    <th>rid</th>
-                    <th>status</th>
+                    <th id="track_number">track_number</th>
+                    <th id="rid">rid</th>
+                    <th id="status">status</th>
                 </tr>
                 <tr>
                     <td>пусто</td>
@@ -140,16 +141,16 @@
             <div class="info-block-title">
                 <h2>Products</h2>
             </div>
-            <table>
+            <table id="tableProduct">
                 <tr>
-                    <th>chrt_id</th>
-                    <th>price</th>
-                    <th>name</th>
-                    <th>sale</th>
-                    <th>size</th>
-                    <th>total_price</th>
-                    <th>nm_id</th>
-                    <th>brand</th>
+                    <th id="chrt_id">chrt_id</th>
+                    <th id="price">price</th>
+                    <th id="name">name</th>
+                    <th id="sale">sale</th>
+                    <th id="size">size</th>
+                    <th id="total_price">total_price</th>
+                    <th id="nm_id">nm_id</th>
+                    <th id="brand">brand</th>
                 </tr>
                 <tr>
                     <td>пусто</td>
@@ -164,6 +165,6 @@
             </table>
         </div>
     </div>
-    
+    <script type="module" src="/static/script.js"></script>
 </body>
 </html>

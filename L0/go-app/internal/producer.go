@@ -2,12 +2,15 @@ package internal
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"os"
 	"strconv"
 	"time"
 
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
+	"github.com/google/uuid"
 	"github.com/segmentio/kafka-go"
 )
 
@@ -69,9 +72,10 @@ func takeListTopics() (map[string]struct{}, error) {
 // Основная функция работы producer
 func Producer(ctx context.Context, topic string, partitions, replicationFactor int) {
 	var (
-		topics map[string]struct{}
-		order  []byte
-		err    error
+		topics      map[string]struct{}
+		orderJson   []byte
+		orderStruct database.Orders
+		err         error
 	)
 
 	// Проверка на наличие topic с нужным именем. Если такового нет, то создаем
@@ -102,16 +106,37 @@ func Producer(ctx context.Context, topic string, partitions, replicationFactor i
 	fmt.Println("Producer успешно запущен!")
 
 	// Берём данные из файла
-	order, err = os.ReadFile("model.json")
+	orderJson, err = os.ReadFile("model.json")
 	if err != nil {
 		fmt.Printf("Ошибка чтения данных из файла model.json: %v\n", err)
 		return
 	}
 
+	// Форматируем в структуру для изменения и отправки уникальных сообщений
+	err = json.Unmarshal(orderJson, &orderStruct)
+	if err != nil {
+		fmt.Printf("Ошибка форматирования данных из json в струкруру из файла model.json: %v\n", err)
+		return
+	}
+
 	// Отправка сообщений брокеру
 	for {
+		// Создаем рандомные uuid для обеспечения уникальности каждой записи
+		orderStruct.Order_uid = uuid.New()
+		orderStruct.Delivery_uid = uuid.New()
+		orderStruct.Payment_uid = uuid.New()
+		for index := range orderStruct.Items {
+			orderStruct.Items[index].Order_uid = orderStruct.Order_uid
+			orderStruct.Items[index].Rid = uuid.New()
+		}
+		orderJson, err = json.Marshal(orderStruct)
+		if err != nil {
+			fmt.Printf("Ошибка форматирования обновленных данных обратно из струкруры в json из файла model.json: %v\n", err)
+			return
+		}
+
 		err = writer.WriteMessages(ctx, kafka.Message{
-			Value: order,
+			Value: orderJson,
 		})
 
 		if err != nil {
@@ -121,6 +146,6 @@ func Producer(ctx context.Context, topic string, partitions, replicationFactor i
 		}
 
 		// Пауза между отправлениями
-		time.Sleep(10 * time.Second)
+		time.Sleep(20 * time.Second)
 	}
 }

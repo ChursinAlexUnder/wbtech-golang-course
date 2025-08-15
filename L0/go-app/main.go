@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/internal"
@@ -18,8 +17,7 @@ func main() {
 		partitions        int    = 3
 		replicationFactor int    = 1
 	)
-	ctx, cancel := context.WithTimeout(context.Background(), 25*time.Second)
-	defer cancel()
+	ctx := context.Background()
 
 	// Подключение к локальной базе данных
 	pool, err := database.InitDB(ctx)
@@ -29,18 +27,17 @@ func main() {
 	}
 	defer pool.Close()
 
+	// Запуск producer в горутине
+	go internal.Producer(ctx, topic, partitions, replicationFactor)
+
+	// Запуск consumer
+	go internal.Consumer(ctx, pool)
+
 	// Запускаем сервер
-	router := router.SetupRouter(pool, ctx)
+	router := router.SetupRouter(ctx, pool)
 	err = router.Run(":8081")
 	if err != nil {
 		fmt.Printf("Не удалось запустить сервер: %v\n", err)
 		return
 	}
-
-	// Запуск producer в горутине
-	go internal.Producer(ctx, topic, partitions, replicationFactor)
-
-	// Запуск consumer
-	internal.Consumer(ctx)
-
 }
