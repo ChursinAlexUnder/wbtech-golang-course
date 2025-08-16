@@ -1,0 +1,84 @@
+package controller
+
+import (
+	"net/http"
+	"path/filepath"
+
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+type Controller struct {
+	pool *pgxpool.Pool
+}
+
+func NewController(pool *pgxpool.Pool) *Controller {
+	return &Controller{pool: pool}
+}
+
+type Message struct {
+	Message string `json:"message" example:"message"`
+}
+
+type HTTPError struct {
+	Code    int    `json:"code" example:"400"`
+	Message string `json:"message" example:"bad request"`
+}
+
+// NewHTTPError — отправляет ошибку клиенту и завершает обработку
+func NewHTTPError(ctx *gin.Context, status int, err error) {
+	ctx.AbortWithStatusJSON(status, HTTPError{
+		Code:    status,
+		Message: err.Error(),
+	})
+}
+
+// @Summary      Главная страница сервиса
+// @Description  Показ главной страницы сервиса, где можно вставить order_uid для получения информации интересующего заказа
+// @Tags         order
+// @Produce      html
+// @Success      200  {string}  string "HTML, css и js"
+// @Failure      400  {object}  HTTPError
+// @Failure      404  {object}  HTTPError
+// @Failure      500  {object}  HTTPError
+// @Router       /order [get]
+func (c *Controller) GetMainPage(ctx *gin.Context) {
+	ctx.File(filepath.Join("frontend", "index.html"))
+}
+
+// @Summary      Отправка информации о заказе
+// @Description  Отправка json файла с сервера на клиент
+// @Tags         api
+// @Accept       json
+// @Produce      json
+// @Param        order_uid   path      string  true  "Uid заказа"
+// @Success      200  {object}  database.Orders
+// @Failure      400  {object}  HTTPError
+// @Failure      404  {object}  HTTPError
+// @Failure      500  {object}  HTTPError
+// @Router       /api/{order_uid} [get]
+func (c *Controller) GetOrderByUid(ctx *gin.Context) {
+	order_uid := ctx.Param("order_uid")
+	answer, err := database.SelectOrderByUid(ctx, c.pool, order_uid)
+	if err != nil {
+		NewHTTPError(ctx, http.StatusBadRequest, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, answer)
+}
+
+// @Summary      Перенаправление
+// @Description  Перенаправление на главную страницу сервиса
+// @Tags         order
+// @Produce      html
+// @Success      200  {string}  string "HTML, css и js"
+// @Success      301  {string}  string "HTML, css и js"
+// @Success      304  {string}  string "HTML, css и js"
+// @Failure      400  {object}  HTTPError
+// @Failure      404  {object}  HTTPError
+// @Failure      500  {object}  HTTPError
+// @Router       / [get]
+func (c *Controller) RedirectOnMainPage(ctx *gin.Context) {
+	ctx.Redirect(http.StatusMovedPermanently, "/order")
+}

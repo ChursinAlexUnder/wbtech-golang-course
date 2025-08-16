@@ -1,0 +1,218 @@
+basePath: /
+definitions:
+  controller.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: bad request
+        type: string
+    type: object
+  database.Delivery:
+    properties:
+      address:
+        type: string
+      city:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      region:
+        type: string
+      uid:
+        type: string
+      zip:
+        type: string
+    type: object
+  database.Items:
+    properties:
+      brand:
+        type: string
+      chrt_id:
+        type: integer
+      name:
+        type: string
+      nm_id:
+        description: Product
+        type: integer
+      order_uid:
+        type: string
+      price:
+        type: number
+      rid:
+        type: string
+      sale:
+        type: integer
+      size:
+        type: string
+      status:
+        type: integer
+      total_price:
+        type: number
+      track_number:
+        type: string
+    type: object
+  database.Orders:
+    properties:
+      customer_id:
+        type: string
+      date_created:
+        type: string
+      delivery:
+        $ref: '#/definitions/database.Delivery'
+      delivery_service:
+        type: string
+      delivery_uid:
+        type: string
+      entry:
+        type: string
+      internal_signature:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/database.Items'
+        type: array
+      locale:
+        type: string
+      oof_shard:
+        type: string
+      order_uid:
+        type: string
+      payment:
+        $ref: '#/definitions/database.Payment'
+      payment_uid:
+        type: string
+      shardkey:
+        type: string
+      sm_id:
+        type: integer
+      track_number:
+        type: string
+    type: object
+  database.Payment:
+    properties:
+      amount:
+        type: number
+      bank:
+        type: string
+      currency:
+        type: string
+      custom_fee:
+        type: number
+      delivery_cost:
+        type: number
+      goods_total:
+        type: integer
+      payment_dt:
+        type: integer
+      provider:
+        type: string
+      request_id:
+        type: string
+      transaction:
+        type: string
+    type: object
+host: localhost:8081
+info:
+  contact: {}
+  description: Данный сервис позволяет получить всю информацию о заказе по его order_uid
+  title: Сервис получения информации о заказе
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: Перенаправление на главную страницу сервиса
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML, css и js
+          schema:
+            type: string
+        "301":
+          description: HTML, css и js
+          schema:
+            type: string
+        "304":
+          description: HTML, css и js
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HTTPError'
+      summary: Перенаправление
+      tags:
+      - order
+  /api/{order_uid}:
+    get:
+      consumes:
+      - application/json
+      description: Отправка json файла с сервера на клиент
+      parameters:
+      - description: Uid заказа
+        in: path
+        name: order_uid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.Orders'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HTTPError'
+      summary: Отправка информации о заказе
+      tags:
+      - api
+  /order:
+    get:
+      description: Показ главной страницы сервиса, где можно вставить order_uid для
+        получения информации интересующего заказа
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML, css и js
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HTTPError'
+      summary: Главная страница сервиса
+      tags:
+      - order
+swagger: "2.0"

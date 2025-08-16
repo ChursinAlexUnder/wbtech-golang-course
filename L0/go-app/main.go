@@ -9,6 +9,13 @@ import (
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/router"
 )
 
+// @title           Сервис получения информации о заказе
+// @version         1.0
+// @description     Данный сервис позволяет получить всю информацию о заказе по его order_uid
+
+// @host      localhost:8081
+// @BasePath  /
+
 func main() {
 	// Если topic-а с необходимым названием для producer не существует,
 	// то он создастся по этим параметрам
