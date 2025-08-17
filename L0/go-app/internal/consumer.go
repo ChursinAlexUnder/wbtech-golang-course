@@ -12,7 +12,7 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-func isValidDataFromKafka(orderJson []byte) bool {
+func IsValidDataFromKafka(orderJson []byte) bool {
 	var (
 		orderStruct database.Orders
 		err         error
@@ -61,7 +61,7 @@ func Consumer(ctx context.Context, pool *pgxpool.Pool) {
 		if err != nil {
 			fmt.Printf("Ошибка принятия сообщения: %v\n", err)
 		} else {
-			if isValidDataFromKafka(msg.Value) {
+			if IsValidDataFromKafka(msg.Value) {
 				err = json.Unmarshal(msg.Value, &order)
 				if err != nil {
 					fmt.Printf("Ошибка обработки в струкруру сообщения: %v\n", err)
