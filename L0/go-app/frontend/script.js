@@ -55,9 +55,19 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch('/api/' + uuid)
             .then(response => response.json()) // Парсим ответ как JSON
             .then(data => {
-                updateElementsFromData(data);
-                fillTable("tableItems", data.items);
-                fillTable("tableProduct", data.items);
+                if (data.message && data.message === "order with this order_uid was not found") {
+                    errorMessage.textContent = "Заказ с данным uid не найден"
+                    errorMessage.style.display = 'block';
+                    searchInput.style.border = "0.2vw solid rgb(219, 23, 23)";
+                    searchInput.style.borderRight = "none";
+                    searchButton.style.border = "0.2vw solid rgb(219, 23, 23)";
+                    searchButton.style.borderLeft = "none";
+                } else {
+                    updateElementsFromData(data);
+                    fillTable("tableItems", data.items);
+                    fillTable("tableProduct", data.items);
+                }
+                
             })
             .catch(error => console.error("Ошибка:", error));
     }
@@ -79,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isCorrectURL(newUrl)) {
             location.assign(newUrl);
         } else {
+            errorMessage.textContent = "Некорректное значение uid"
             errorMessage.style.display = 'block';
             searchInput.style.border = "0.2vw solid rgb(219, 23, 23)";
             searchInput.style.borderRight = "none";

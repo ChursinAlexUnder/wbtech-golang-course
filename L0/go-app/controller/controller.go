@@ -1,20 +1,24 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Controller struct {
-	pool *pgxpool.Pool
+	pool  *pgxpool.Pool
+	cache *expirable.LRU[uuid.UUID, database.Orders]
 }
 
-func NewController(pool *pgxpool.Pool) *Controller {
-	return &Controller{pool: pool}
+func NewController(pool *pgxpool.Pool, cache *expirable.LRU[uuid.UUID, database.Orders]) *Controller {
+	return &Controller{pool: pool, cache: cache}
 }
 
 type Message struct {
@@ -22,7 +26,7 @@ type Message struct {
 }
 
 type HTTPError struct {
-	Code    int    `json:"code" example:"400"`
+	Code    int    `json:"code" example:"500"`
 	Message string `json:"message" example:"bad request"`
 }
 
@@ -59,11 +63,29 @@ func (c *Controller) GetMainPage(ctx *gin.Context) {
 // @Failure      500  {object}  HTTPError
 // @Router       /api/{order_uid} [get]
 func (c *Controller) GetOrderByUid(ctx *gin.Context) {
-	order_uid := ctx.Param("order_uid")
-	answer, err := database.SelectOrderByUid(ctx, c.pool, order_uid)
+	var (
+		answer database.Orders
+		err    error
+	)
+	// Обрабатываем order_uid
+	order_uid_string := ctx.Param("order_uid")
+	order_uid, err := uuid.Parse(order_uid_string)
 	if err != nil {
 		NewHTTPError(ctx, http.StatusBadRequest, err)
 		return
+	}
+
+	// Сначала ищем в кеше, иначе берем из бд
+	answer, ok := c.cache.Get(order_uid)
+	if !ok {
+		answer, err = database.SelectOrderByUid(ctx, c.pool, order_uid_string)
+		if err != nil {
+			NewHTTPError(ctx, http.StatusBadRequest, err)
+			return
+		}
+		fmt.Printf("Запись с order_uid %s взята из бд!\n", answer.Order_uid)
+	} else {
+		fmt.Printf("Запись с order_uid %s успешно взята из кеша!\n", answer.Order_uid)
 	}
 	ctx.JSON(http.StatusOK, answer)
 }

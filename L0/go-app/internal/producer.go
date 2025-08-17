@@ -100,6 +100,11 @@ func Producer(ctx context.Context, topic string, partitions, replicationFactor i
 	writer := &kafka.Writer{
 		Addr:                   kafka.TCP("kafka:9093"),
 		Topic:                  "orders",
+		RequiredAcks:           -1, // ожидание подтверждения от всех реплик
+		MaxAttempts:            10,
+		BatchSize:              100,
+		WriteTimeout:           10 * time.Second,
+		Balancer:               &kafka.RoundRobin{},
 		AllowAutoTopicCreation: true,
 	}
 	defer writer.Close()

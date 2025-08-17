@@ -7,6 +7,8 @@ import (
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/internal"
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/router"
+	"github.com/google/uuid"
+	"github.com/hashicorp/golang-lru/v2/expirable"
 )
 
 // @title           Сервис получения информации о заказе
@@ -23,6 +25,9 @@ func main() {
 		topic             string = "orders"
 		partitions        int    = 3
 		replicationFactor int    = 1
+
+		// Для кеша
+		orders []database.Orders
 	)
 	ctx := context.Background()
 
@@ -34,6 +39,19 @@ func main() {
 	}
 	defer pool.Close()
 
+	cache := expirable.NewLRU[uuid.UUID, database.Orders](1000, nil, 0)
+
+	orders, err = database.SelectOrdersForCache(ctx, pool)
+	if err != nil {
+		fmt.Printf("Не удалось получить актуальные заказы для загрузки кеша из бд: %v\n", err)
+		return
+	}
+
+	for _, order := range orders {
+		cache.Add(order.Order_uid, order)
+	}
+	fmt.Printf("Кеш успешно заполнен!\nТекущее количество записей в кеше %d\n", cache.Len())
+
 	// Запуск producer в горутине
 	go internal.Producer(ctx, topic, partitions, replicationFactor)
 
@@ -41,7 +59,7 @@ func main() {
 	go internal.Consumer(ctx, pool)
 
 	// Запускаем сервер
-	router := router.SetupRouter(ctx, pool)
+	router := router.SetupRouter(ctx, pool, cache)
 	err = router.Run(":8081")
 	if err != nil {
 		fmt.Printf("Не удалось запустить сервер: %v\n", err)

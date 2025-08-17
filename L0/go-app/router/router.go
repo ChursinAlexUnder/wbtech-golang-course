@@ -4,14 +4,17 @@ import (
 	"context"
 
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/controller"
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
 	_ "github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/docs"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/jackc/pgx/v5/pgxpool"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetupRouter(ctx context.Context, pool *pgxpool.Pool) *gin.Engine {
+func SetupRouter(ctx context.Context, pool *pgxpool.Pool, cache *expirable.LRU[uuid.UUID, database.Orders]) *gin.Engine {
 	// Режим прода и тестирования соответственно (доп. логирование)
 	gin.SetMode(gin.ReleaseMode)
 	// gin.SetMode(gin.DebugMode)
@@ -19,7 +22,7 @@ func SetupRouter(ctx context.Context, pool *pgxpool.Pool) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger(), gin.Recovery())
 
-	c := controller.NewController(pool)
+	c := controller.NewController(pool, cache)
 
 	// Редирект на страницу с web-интерфейсом
 	router.GET("/", c.RedirectOnMainPage)
