@@ -12,7 +12,6 @@ type Orders struct {
 	Entry              string    `json:"entry"`
 	Delivery_uid       uuid.UUID `json:"delivery_uid"`
 	Delivery           Delivery  `json:"delivery"`
-	Payment_uid        uuid.UUID `json:"payment_uid"`
 	Payment            Payment   `json:"payment"`
 	Items              []Items   `json:"items"`
 	Locale             string    `json:"locale"`
@@ -53,15 +52,12 @@ type Items struct {
 	Track_number string    `json:"track_number"`
 	Rid          uuid.UUID `json:"rid"`
 	Status       int       `json:"status"`
-
-	// Product
-	Nm_id       int       `json:"nm_id"`
-	Chrt_id     int       `json:"chrt_id"`
-	Price       float64   `json:"price"`
-	Name        string    `json:"name"`
-	Sale        int       `json:"sale"`
-	Size        string    `json:"size"`
-	Total_price float64   `json:"total_price"`
-	Brand       string    `json:"brand"`
-	Order_uid   uuid.UUID `json:"order_uid"`
+	Nm_id        int       `json:"nm_id"`
+	Chrt_id      int       `json:"chrt_id"`
+	Price        float64   `json:"price"`
+	Name         string    `json:"name"`
+	Sale         int       `json:"sale"`
+	Size         string    `json:"size"`
+	Total_price  float64   `json:"total_price"`
+	Brand        string    `json:"brand"`
 }

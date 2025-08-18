@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net"
 	"os"
 	"strconv"
@@ -78,6 +79,8 @@ func Producer(ctx context.Context, topic string, partitions, replicationFactor i
 		err         error
 	)
 
+	rand.Seed(time.Now().UnixNano())
+
 	// Проверка на наличие topic с нужным именем. Если такового нет, то создаем
 	for haveTopic := false; !haveTopic; {
 		topics, err = takeListTopics()
@@ -128,11 +131,23 @@ func Producer(ctx context.Context, topic string, partitions, replicationFactor i
 	for {
 		// Создаем рандомные uuid для обеспечения уникальности каждой записи
 		orderStruct.Order_uid = uuid.New()
+		orderStruct.Payment.Transaction = orderStruct.Order_uid
 		orderStruct.Delivery_uid = uuid.New()
-		orderStruct.Payment_uid = uuid.New()
+		orderStruct.Delivery.Uid = orderStruct.Delivery_uid
+
+		// Для track_number
+		// Случайный номер символа от 1 до 14
+		randomIndex := rune(rand.Intn(12) + 1)
+		// Случайное число для символа английского алфавита от 65 до 122
+		randomNumber := rune(rand.Intn(56) + 65)
+		// Перевоплощение
+		trackNumberRune := []rune(orderStruct.Track_number)
+		trackNumberRune[randomIndex] = randomNumber
+		orderStruct.Track_number = string(trackNumberRune)
+
 		for index := range orderStruct.Items {
-			orderStruct.Items[index].Order_uid = orderStruct.Order_uid
 			orderStruct.Items[index].Rid = uuid.New()
+			orderStruct.Items[index].Track_number = orderStruct.Track_number
 		}
 		orderJson, err = json.Marshal(orderStruct)
 		if err != nil {

@@ -38,7 +38,6 @@ func SelectOrderByUid(ctx context.Context, pool *pgxpool.Pool, order_uid string)
 			&order.Track_number,
 			&order.Entry,
 			&order.Delivery_uid,
-			&order.Payment_uid,
 			&order.Locale,
 			&order.Internal_signature,
 			&order.Customer_id,
@@ -70,7 +69,7 @@ func SelectOrderByUid(ctx context.Context, pool *pgxpool.Pool, order_uid string)
 	// Получение данных payment
 	rowPayment, err = pool.Query(ctx, `SELECT *
 								FROM payment
-								WHERE payment.transaction = $1`, order.Payment_uid)
+								WHERE payment.transaction = $1`, order.Order_uid)
 	if err != nil {
 		return Orders{}, err
 	}
@@ -84,7 +83,7 @@ func SelectOrderByUid(ctx context.Context, pool *pgxpool.Pool, order_uid string)
 	// Получение данных об items
 	rowsItems, err = pool.Query(ctx, `SELECT *
 								FROM items
-								WHERE items.order_uid = $1`, order.Order_uid)
+								WHERE items.track_number = $1`, order.Track_number)
 	if err != nil {
 		return Orders{}, err
 	}
@@ -122,7 +121,6 @@ func SelectOrdersForCache(ctx context.Context, pool *pgxpool.Pool) ([]Orders, er
 			&order.Track_number,
 			&order.Entry,
 			&order.Delivery_uid,
-			&order.Payment_uid,
 			&order.Locale,
 			&order.Internal_signature,
 			&order.Customer_id,
@@ -152,7 +150,7 @@ func SelectOrdersForCache(ctx context.Context, pool *pgxpool.Pool) ([]Orders, er
 		// Получение данных payment
 		rowPayment, err = pool.Query(ctx, `SELECT *
 								FROM payment
-								WHERE payment.transaction = $1`, order.Payment_uid)
+								WHERE payment.transaction = $1`, order.Order_uid)
 		if err != nil {
 			return []Orders{}, err
 		}
@@ -166,7 +164,7 @@ func SelectOrdersForCache(ctx context.Context, pool *pgxpool.Pool) ([]Orders, er
 		// Получение данных об items
 		rowsItems, err = pool.Query(ctx, `SELECT *
 								FROM items
-								WHERE items.order_uid = $1`, order.Order_uid)
+								WHERE items.track_number = $1`, order.Track_number)
 		if err != nil {
 			return []Orders{}, err
 		}

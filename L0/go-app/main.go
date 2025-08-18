@@ -56,7 +56,7 @@ func main() {
 	go internal.Producer(ctx, topic, partitions, replicationFactor)
 
 	// Запуск consumer
-	go internal.Consumer(ctx, pool)
+	go internal.Consumer(ctx, pool, cache)
 
 	// Запускаем сервер
 	router := router.SetupRouter(ctx, pool, cache)

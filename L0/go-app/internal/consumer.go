@@ -8,6 +8,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
+	"github.com/google/uuid"
+	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/segmentio/kafka-go"
 )
@@ -26,19 +28,22 @@ func IsValidDataFromKafka(orderJson []byte) bool {
 		utf8.RuneCountInString(orderStruct.Payment.Provider) > 50 ||
 		utf8.RuneCountInString(orderStruct.Payment.Bank) > 50 ||
 		utf8.RuneCountInString(orderStruct.Delivery.Phone) > 30 ||
-		utf8.RuneCountInString(orderStruct.Delivery.Email) > 254 {
+		utf8.RuneCountInString(orderStruct.Delivery.Email) > 254 ||
+		orderStruct.Payment.Transaction != orderStruct.Order_uid ||
+		orderStruct.Delivery.Uid != orderStruct.Delivery_uid {
 		return false
 	}
 	for _, item := range orderStruct.Items {
 		if utf8.RuneCountInString(item.Size) > 10 ||
-			utf8.RuneCountInString(item.Brand) > 150 {
+			utf8.RuneCountInString(item.Brand) > 150 ||
+			item.Track_number != orderStruct.Track_number {
 			return false
 		}
 	}
 	return true
 }
 
-func Consumer(ctx context.Context, pool *pgxpool.Pool) {
+func Consumer(ctx context.Context, pool *pgxpool.Pool, cache *expirable.LRU[uuid.UUID, database.Orders]) {
 	var order database.Orders
 
 	dialer := &kafka.Dialer{
@@ -71,7 +76,10 @@ func Consumer(ctx context.Context, pool *pgxpool.Pool) {
 					if err != nil {
 						fmt.Printf("Ошибка вставки полученных данных из kafka в бд: %v\n", err)
 					} else {
-						fmt.Printf("Новая запись успешно вставлена! Её order_uid: %s\n", order.Order_uid)
+						fmt.Printf("Новая запись успешно вставлена в бд! Её order_uid: %s\n", order.Order_uid)
+						// Добавление новой записи в кеш
+						cache.Add(order.Order_uid, order)
+						fmt.Printf("Новая запись успешно добавлена в кеш! Её order_uid: %s\n", order.Order_uid)
 					}
 				}
 				// Коммитим оффсет вручную после обработки
