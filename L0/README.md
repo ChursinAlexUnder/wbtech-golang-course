@@ -1,6 +1,6 @@
 Как запустить:
 
-В папке L0 команда docker compose up --build
+В текущей папке команда docker compose up --build
 
 Основные эндпоинты:
 
