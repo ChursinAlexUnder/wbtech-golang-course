@@ -7,7 +7,9 @@
 Golang приложение
 
 localhost:8081/order - главная страница сайта
+
 localhost:8081/order/<order_uid> - информация о заказе в web интерфейсе
+
 localhost:8081/api/<order_uid> - json заказа с сервера
 
 Kafka-ui
