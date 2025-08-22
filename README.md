@@ -1,0 +1,49 @@
+# L0
+## Как запустить:
+В каталоге **L0** команда:
+```
+docker compose up --build
+```
+## Эндпоинты:
+### Golang приложение
+- [localhost:8081/order](url) - главная страница сайта
+- [localhost:8081/order/<order_uid>](url) - информация о заказе в web интерфейсе
+- [localhost:8081/api/<order_uid>](url) - json заказа с сервера
+### Kafka-ui
+- [localhost:8080/](url) - главная страница
+### Swagger
+- [localhost:8081/swagger/index.html](url) - главная страница
+## Структура проекта L0
+```
+├── go-app/ - директория go-сервиса
+│   ├── controller/
+│   │   └── controller.go - файл с настройкой эндпоинтов и их описанием для swagger
+│   ├── database/
+│   │   ├── connection.go - подключение к базе данных
+│   │   ├── inserter.go - вставка данных из kafka в бд
+│   │   ├── selecter.go - взятие данных из бд
+│   │   └── structure.go - структуры для взаимодействия с данными
+│   ├── docs/ - папка для работы swagger (создается вместе с файлами внутри автоматически с помощью используемой библиотеки)
+│   │   ├── docs.go
+│   │   ├── swagger.json
+│   │   └── swagger.yaml
+│   ├── frontend/
+│   │   ├── favicon.ico - иконка для вкладки в браузере
+│   │   ├── index.html - страница сайта
+│   │   ├── script.js - скрипт с валидацией, заполнением данных на странице и отправкой/принятием данных с сервера
+│   │   └── style.css - стили для страницы
+│   ├── internal/
+│   │   ├── consumer.go - вся логика consumer-а + валидация данных от брокера
+│   │   ├── consumer_test.go - unit-тест
+│   │   └── producer.go вся логика producer-а
+│   ├── router/
+│   │   └── router.go - файл с вызовом эндпоинтов
+│   ├── Dockerfile - docker файл для создания образа go-сервиса
+│   ├── go.mod - файл зависимости
+│   ├── go.sum - файл зависимости
+│   ├── main.go - точка входа приложения
+│   └── model.json - файл с json, который producer считывает для отправки в kafka
+├── database.sql - файл со структурой таблиц для локальной базы данных
+└── docker-compose.yml - compose файл для создания и запуска всех образов
+```
+# L1
