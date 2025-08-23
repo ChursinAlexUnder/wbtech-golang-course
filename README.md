@@ -50,4 +50,4 @@ docker compose up --build
 ├── database.sql - файл со структурой таблиц для локальной базы данных
 └── docker-compose.yml - compose файл для создания и запуска всех образов
 ```
-# L1
+---
