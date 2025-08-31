@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal/database"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/hashicorp/golang-lru/v2/expirable"

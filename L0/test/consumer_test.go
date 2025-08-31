@@ -1,4 +1,4 @@
-package internal
+package test
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal/database"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -55,7 +55,7 @@ func TestIsValidDataFromKafka(t *testing.T) {
 	testTable = append(testTable, testInputData{orderJson, true})
 
 	for index, test := range testTable {
-		result := IsValidDataFromKafka(test.order)
+		result := database.IsValidDataFromKafka(test.order)
 
 		t.Logf("Вызван тест №%d с результатом %t\n", index+1, result)
 

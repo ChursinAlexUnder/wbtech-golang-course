@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
-	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/internal"
-	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/router"
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal"
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal/database"
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal/router"
 	"github.com/google/uuid"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 )

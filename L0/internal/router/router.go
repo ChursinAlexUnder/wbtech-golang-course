@@ -3,9 +3,9 @@ package router
 import (
 	"context"
 
-	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/controller"
-	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
-	_ "github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/docs"
+	_ "github.com/ChursinAlexUnder/wbtech-golang-course/L0/docs"
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal/controller"
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal/database"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/hashicorp/golang-lru/v2/expirable"

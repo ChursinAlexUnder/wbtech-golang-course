@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal/database"
 	"github.com/google/uuid"
 	"github.com/segmentio/kafka-go"
 )

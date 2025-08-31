@@ -7,7 +7,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/go-app/database"
+	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal/database"
 	"github.com/google/uuid"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/jackc/pgx/v5/pgxpool"
