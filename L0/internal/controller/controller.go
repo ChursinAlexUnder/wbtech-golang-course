@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"path/filepath"
 
@@ -83,9 +83,9 @@ func (c *Controller) GetOrderByUid(ctx *gin.Context) {
 			NewHTTPError(ctx, http.StatusBadRequest, err)
 			return
 		}
-		fmt.Printf("Запись с order_uid %s взята из бд!\n", answer.Order_uid)
+		log.Printf("Запись с order_uid %s взята из бд!\n", answer.Order_uid)
 	} else {
-		fmt.Printf("Запись с order_uid %s успешно взята из кеша!\n", answer.Order_uid)
+		log.Printf("Запись с order_uid %s успешно взята из кеша!\n", answer.Order_uid)
 	}
 	ctx.JSON(http.StatusOK, answer)
 }

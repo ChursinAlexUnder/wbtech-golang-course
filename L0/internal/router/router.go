@@ -34,7 +34,7 @@ func SetupRouter(ctx context.Context, pool *pgxpool.Pool, cache *expirable.LRU[u
 	router.GET("/order/*any", c.GetMainPage)
 
 	// Отдача статики (css, js)
-	router.Static("/static", "frontend")
+	router.Static("/static", "../../web")
 
 	// Служебный эндпоинт для передачи json о заказе
 	router.GET("/api/:order_uid", c.GetOrderByUid)

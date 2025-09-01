@@ -3,7 +3,7 @@ package internal
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"log"
 	"time"
 	"unicode/utf8"
 
@@ -58,37 +58,37 @@ func Consumer(ctx context.Context, pool *pgxpool.Pool, cache *expirable.LRU[uuid
 		CommitInterval: 0,
 		Dialer:         dialer,
 	})
-	fmt.Println("Consumer успешно запущен!")
+	log.Println("Consumer успешно запущен!")
 
 	// Чтение сообщений
 	for {
 		msg, err := reader.ReadMessage(ctx)
 		if err != nil {
-			fmt.Printf("Ошибка принятия сообщения: %v\n", err)
+			log.Printf("Ошибка принятия сообщения: %v\n", err)
 		} else {
 			if IsValidDataFromKafka(msg.Value) {
 				err = json.Unmarshal(msg.Value, &order)
 				if err != nil {
-					fmt.Printf("Ошибка обработки в струкруру сообщения: %v\n", err)
+					log.Printf("Ошибка обработки в струкруру сообщения: %v\n", err)
 				} else {
 					// Вставляем в бд
 					err = database.InsertOrder(ctx, pool, order)
 					if err != nil {
-						fmt.Printf("Ошибка вставки полученных данных из kafka в бд: %v\n", err)
+						log.Printf("Ошибка вставки полученных данных из kafka в бд: %v\n", err)
 					} else {
-						fmt.Printf("Новая запись успешно вставлена в бд! Её order_uid: %s\n", order.Order_uid)
+						log.Printf("Новая запись успешно вставлена в бд! Её order_uid: %s\n", order.Order_uid)
 						// Добавление новой записи в кеш
 						cache.Add(order.Order_uid, order)
-						fmt.Printf("Новая запись успешно добавлена в кеш! Её order_uid: %s\n", order.Order_uid)
+						log.Printf("Новая запись успешно добавлена в кеш! Её order_uid: %s\n", order.Order_uid)
 					}
 				}
 				// Коммитим оффсет вручную после обработки
 				err = reader.CommitMessages(ctx, msg)
 				if err != nil {
-					fmt.Printf("Ошибка коммита сообщения: %v\n", err)
+					log.Printf("Ошибка коммита сообщения: %v\n", err)
 				}
 			} else {
-				fmt.Println("Пришедшие данные из kafka невалидны!")
+				log.Println("Пришедшие данные из kafka невалидны!")
 			}
 		}
 	}

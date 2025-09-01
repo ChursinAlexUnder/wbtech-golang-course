@@ -3,7 +3,7 @@ package internal
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"log"
 	"math/rand"
 	"net"
 	"os"
@@ -85,7 +85,7 @@ func Producer(ctx context.Context, topic string, partitions, replicationFactor i
 	for haveTopic := false; !haveTopic; {
 		topics, err = takeListTopics()
 		if err != nil {
-			fmt.Printf("Ошибка чтения списка topic-ов: %v\n", err)
+			log.Printf("Ошибка чтения списка topic-ов: %v\n", err)
 		} else {
 			if _, ok := topics[topic]; ok {
 				haveTopic = true
@@ -93,7 +93,7 @@ func Producer(ctx context.Context, topic string, partitions, replicationFactor i
 				// Создание кастомного topic
 				err = createCustomTopic(topic, partitions, replicationFactor)
 				if err != nil {
-					fmt.Printf("Ошибка добавления нового topic: %v\n", err)
+					log.Printf("Ошибка добавления нового topic: %v\n", err)
 				}
 			}
 		}
@@ -111,19 +111,19 @@ func Producer(ctx context.Context, topic string, partitions, replicationFactor i
 		AllowAutoTopicCreation: true,
 	}
 	defer writer.Close()
-	fmt.Println("Producer успешно запущен!")
+	log.Println("Producer успешно запущен!")
 
 	// Берём данные из файла
-	orderJson, err = os.ReadFile("model.json")
+	orderJson, err = os.ReadFile("../../api/model.json")
 	if err != nil {
-		fmt.Printf("Ошибка чтения данных из файла model.json: %v\n", err)
+		log.Printf("Ошибка чтения данных из файла model.json: %v\n", err)
 		return
 	}
 
 	// Форматируем в структуру для изменения и отправки уникальных сообщений
 	err = json.Unmarshal(orderJson, &orderStruct)
 	if err != nil {
-		fmt.Printf("Ошибка форматирования данных из json в струкруру из файла model.json: %v\n", err)
+		log.Printf("Ошибка форматирования данных из json в струкруру из файла model.json: %v\n", err)
 		return
 	}
 
@@ -151,7 +151,7 @@ func Producer(ctx context.Context, topic string, partitions, replicationFactor i
 		}
 		orderJson, err = json.Marshal(orderStruct)
 		if err != nil {
-			fmt.Printf("Ошибка форматирования обновленных данных обратно из струкруры в json из файла model.json: %v\n", err)
+			log.Printf("Ошибка форматирования обновленных данных обратно из струкруры в json из файла model.json: %v\n", err)
 			return
 		}
 
@@ -160,9 +160,9 @@ func Producer(ctx context.Context, topic string, partitions, replicationFactor i
 		})
 
 		if err != nil {
-			fmt.Printf("Ошибка отправки сообщения: %v\n", err)
+			log.Printf("Ошибка отправки сообщения: %v\n", err)
 		} else {
-			fmt.Println("Сообщение успешно отправлено!")
+			log.Println("Сообщение успешно отправлено!")
 		}
 
 		// Пауза между отправлениями

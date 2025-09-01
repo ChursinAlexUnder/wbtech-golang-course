@@ -15,7 +15,7 @@ const dsn = "postgres://wbtech-L0:16530@host.docker.internal:5432/wbtech-golang-
 // const dsn = "postgres://wbtech-L0:16530@localhost:5432/wbtech-golang-course-L0?sslmode=disable"
 
 func InitDB(ctx context.Context) (*pgxpool.Pool, error) {
-	m, err := migrate.New("file:///schema", dsn)
+	m, err := migrate.New("file:///app/schema", dsn)
 	if err != nil {
 		return nil, err
 	}

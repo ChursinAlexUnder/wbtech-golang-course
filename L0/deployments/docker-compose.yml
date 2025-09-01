@@ -38,8 +38,8 @@ services:
   go-app:
     image: go-app
     build:
-      context: ..
-      dockerfile: build/Dockerfile
+      context: ../
+      dockerfile: ./build/package/Dockerfile
     ports:
       - 8081:8081
     depends_on:

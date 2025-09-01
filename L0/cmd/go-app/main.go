@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
 
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal"
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal/database"
@@ -34,7 +34,7 @@ func main() {
 	// Подключение к локальной базе данных
 	pool, err := database.InitDB(ctx)
 	if err != nil {
-		fmt.Printf("Не удалось подключиться к бд: %v\n", err)
+		log.Printf("Не удалось подключиться к бд: %v\n", err)
 		return
 	}
 	defer pool.Close()
@@ -43,14 +43,14 @@ func main() {
 
 	orders, err = database.SelectOrdersForCache(ctx, pool)
 	if err != nil {
-		fmt.Printf("Не удалось получить актуальные заказы для загрузки кеша из бд: %v\n", err)
+		log.Printf("Не удалось получить актуальные заказы для загрузки кеша из бд: %v\n", err)
 		return
 	}
 
 	for _, order := range orders {
 		cache.Add(order.Order_uid, order)
 	}
-	fmt.Printf("Кеш успешно заполнен!\nТекущее количество записей в кеше %d\n", cache.Len())
+	log.Printf("Кеш успешно заполнен!\nТекущее количество записей в кеше %d\n", cache.Len())
 
 	// Запуск producer в горутине
 	go internal.Producer(ctx, topic, partitions, replicationFactor)
@@ -62,7 +62,7 @@ func main() {
 	router := router.SetupRouter(ctx, pool, cache)
 	err = router.Run(":8081")
 	if err != nil {
-		fmt.Printf("Не удалось запустить сервер: %v\n", err)
+		log.Printf("Не удалось запустить сервер: %v\n", err)
 		return
 	}
 }

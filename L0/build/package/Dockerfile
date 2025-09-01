@@ -8,8 +8,8 @@ RUN go mod download
 COPY ./ ./
 
 # Запуск тестов
-RUN go test ./internal
+RUN go test ./test
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
+RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping ./cmd/go-app
 
 CMD ["/docker-gs-ping"]
