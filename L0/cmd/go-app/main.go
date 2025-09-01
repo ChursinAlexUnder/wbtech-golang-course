@@ -3,6 +3,12 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
 
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal"
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal/database"
@@ -28,13 +34,17 @@ func main() {
 
 		// Для кеша
 		orders []database.Orders
+
+		// Для горутин
+		wg sync.WaitGroup
 	)
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// Подключение к локальной базе данных
 	pool, err := database.InitDB(ctx)
 	if err != nil {
-		log.Printf("Не удалось подключиться к бд: %v\n", err)
+		log.Fatalf("Не удалось подключиться к бд: %v\n", err)
 		return
 	}
 	defer pool.Close()
@@ -43,7 +53,7 @@ func main() {
 
 	orders, err = database.SelectOrdersForCache(ctx, pool)
 	if err != nil {
-		log.Printf("Не удалось получить актуальные заказы для загрузки кеша из бд: %v\n", err)
+		log.Fatalf("Не удалось получить актуальные заказы для загрузки кеша из бд: %v\n", err)
 		return
 	}
 
@@ -52,17 +62,58 @@ func main() {
 	}
 	log.Printf("Кеш успешно заполнен!\nТекущее количество записей в кеше %d\n", cache.Len())
 
+	wg.Add(1)
+
 	// Запуск producer в горутине
-	go internal.Producer(ctx, topic, partitions, replicationFactor)
+	go func() {
+		defer wg.Done()
+		internal.Producer(ctx, topic, partitions, replicationFactor)
+	}()
 
 	// Запуск consumer
-	go internal.Consumer(ctx, pool, cache)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		internal.Consumer(ctx, pool, cache)
+	}()
 
 	// Запускаем сервер
 	router := router.SetupRouter(ctx, pool, cache)
-	err = router.Run(":8081")
-	if err != nil {
-		log.Printf("Не удалось запустить сервер: %v\n", err)
-		return
+	srv := &http.Server{
+		Addr:    ":8081",
+		Handler: router,
 	}
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Не удалось запустить сервер: %v\n", err)
+		}
+	}()
+
+	log.Println("Приложение успешно запустилось")
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	<-quit
+
+	log.Println("Приложение плавно выключается")
+	cancel()
+
+	if err := srv.Shutdown(context.Background()); err != nil {
+		log.Fatalf("Ошибка плавного выключения приложения: %v", err)
+	}
+
+	done := make(chan struct{})
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		// всё завершилось нормально
+	case <-time.After(5 * time.Second):
+		log.Println("Timeout ожидания фоновых горутин, принудительное завершение")
+	}
+
+	log.Println("Приложение выключилось")
 }

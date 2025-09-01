@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"time"
 	"unicode/utf8"
@@ -58,38 +59,60 @@ func Consumer(ctx context.Context, pool *pgxpool.Pool, cache *expirable.LRU[uuid
 		CommitInterval: 0,
 		Dialer:         dialer,
 	})
+	defer func() {
+		if err := reader.Close(); err != nil {
+			log.Printf("Ошибка закрытия reader: %v", err)
+		}
+	}()
+
 	log.Println("Consumer успешно запущен!")
 
-	// Чтение сообщений
 	for {
+		if ctx.Err() != nil {
+			log.Println("Consumer: контекст отменён, завершение работы")
+			return
+		}
+
 		msg, err := reader.ReadMessage(ctx)
 		if err != nil {
-			log.Printf("Ошибка принятия сообщения: %v\n", err)
-		} else {
-			if IsValidDataFromKafka(msg.Value) {
-				err = json.Unmarshal(msg.Value, &order)
-				if err != nil {
-					log.Printf("Ошибка обработки в струкруру сообщения: %v\n", err)
-				} else {
-					// Вставляем в бд
-					err = database.InsertOrder(ctx, pool, order)
-					if err != nil {
-						log.Printf("Ошибка вставки полученных данных из kafka в бд: %v\n", err)
-					} else {
-						log.Printf("Новая запись успешно вставлена в бд! Её order_uid: %s\n", order.Order_uid)
-						// Добавление новой записи в кеш
-						cache.Add(order.Order_uid, order)
-						log.Printf("Новая запись успешно добавлена в кеш! Её order_uid: %s\n", order.Order_uid)
-					}
-				}
-				// Коммитим оффсет вручную после обработки
-				err = reader.CommitMessages(ctx, msg)
-				if err != nil {
-					log.Printf("Ошибка коммита сообщения: %v\n", err)
-				}
-			} else {
-				log.Println("Пришедшие данные из kafka невалидны!")
+			if errors.Is(err, context.Canceled) || ctx.Err() != nil {
+				log.Println("Consumer: чтение прервано контекстом, завершение работы")
+				return
 			}
+			log.Printf("Ошибка принятия сообщения: %v\n", err)
+			time.Sleep(1 * time.Second)
+			continue
+		}
+
+		// обработка сообщения
+		if !IsValidDataFromKafka(msg.Value) {
+			log.Println("Пришедшие данные из kafka невалидны, пропуск сообщения")
+			continue
+		}
+
+		if err := json.Unmarshal(msg.Value, &order); err != nil {
+			log.Printf("Ошибка обработки в структуру сообщения: %v\n", err)
+			continue
+		}
+
+		// Вставляем в БД
+		if err := database.InsertOrder(ctx, pool, order); err != nil {
+			log.Printf("Ошибка вставки полученных данных из kafka в бд: %v\n", err)
+			continue
+		}
+		log.Printf("Новая запись успешно вставлена в бд! Её order_uid: %s\n", order.Order_uid)
+
+		// Обновляем кэш
+		cache.Add(order.Order_uid, order)
+		log.Printf("Новая запись успешно добавлена в кеш! Её order_uid: %s\n", order.Order_uid)
+
+		// Коммитим оффсет вручную после обработки
+		if err := reader.CommitMessages(ctx, msg); err != nil {
+			if errors.Is(err, context.Canceled) || ctx.Err() != nil {
+				log.Println("CommitMessages прерван контекстом")
+				return
+			}
+			log.Printf("Ошибка коммита сообщения: %v\n", err)
 		}
 	}
 }

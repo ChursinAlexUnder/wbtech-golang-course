@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"math/rand"
 	"net"
@@ -72,100 +73,90 @@ func takeListTopics() (map[string]struct{}, error) {
 
 // Основная функция работы producer
 func Producer(ctx context.Context, topic string, partitions, replicationFactor int) {
-	var (
-		topics      map[string]struct{}
-		orderJson   []byte
-		orderStruct database.Orders
-		err         error
-	)
-
-	rand.Seed(time.Now().UnixNano())
-
-	// Проверка на наличие topic с нужным именем. Если такового нет, то создаем
-	for haveTopic := false; !haveTopic; {
-		topics, err = takeListTopics()
-		if err != nil {
-			log.Printf("Ошибка чтения списка topic-ов: %v\n", err)
-		} else {
-			if _, ok := topics[topic]; ok {
-				haveTopic = true
-			} else {
-				// Создание кастомного topic
-				err = createCustomTopic(topic, partitions, replicationFactor)
-				if err != nil {
-					log.Printf("Ошибка добавления нового topic: %v\n", err)
-				}
-			}
-		}
-	}
-
-	// Инициализация producer с настройками адреса брокера и имени топика
+	// Инициализация writer
 	writer := &kafka.Writer{
 		Addr:                   kafka.TCP("kafka:9093"),
-		Topic:                  "orders",
-		RequiredAcks:           -1, // ожидание подтверждения от всех реплик
+		Topic:                  topic,
+		RequiredAcks:           -1,
 		MaxAttempts:            10,
 		BatchSize:              100,
 		WriteTimeout:           10 * time.Second,
 		Balancer:               &kafka.RoundRobin{},
 		AllowAutoTopicCreation: true,
 	}
-	defer writer.Close()
+	defer func() {
+		if err := writer.Close(); err != nil {
+			log.Printf("Ошибка закрытия writer: %v", err)
+		}
+	}()
+
 	log.Println("Producer успешно запущен!")
 
-	// Берём данные из файла
-	orderJson, err = os.ReadFile("../../api/model.json")
+	// Загружаем шаблон один раз
+	orderJson, err := os.ReadFile("./api/model.json")
 	if err != nil {
 		log.Printf("Ошибка чтения данных из файла model.json: %v\n", err)
 		return
 	}
-
-	// Форматируем в структуру для изменения и отправки уникальных сообщений
-	err = json.Unmarshal(orderJson, &orderStruct)
-	if err != nil {
-		log.Printf("Ошибка форматирования данных из json в струкруру из файла model.json: %v\n", err)
+	var orderStruct database.Orders
+	if err := json.Unmarshal(orderJson, &orderStruct); err != nil {
+		log.Printf("Ошибка форматирования данных из json в структуру: %v\n", err)
 		return
 	}
 
-	// Отправка сообщений брокеру
+	rand.Seed(time.Now().UnixNano())
+
 	for {
-		// Создаем рандомные uuid для обеспечения уникальности каждой записи
-		orderStruct.Order_uid = uuid.New()
-		orderStruct.Payment.Transaction = orderStruct.Order_uid
-		orderStruct.Delivery_uid = uuid.New()
-		orderStruct.Delivery.Uid = orderStruct.Delivery_uid
-
-		// Для track_number
-		// Случайный номер символа от 1 до 14
-		randomIndex := rune(rand.Intn(12) + 1)
-		// Случайное число для символа английского алфавита от 65 до 122
-		randomNumber := rune(rand.Intn(56) + 65)
-		// Перевоплощение
-		trackNumberRune := []rune(orderStruct.Track_number)
-		trackNumberRune[randomIndex] = randomNumber
-		orderStruct.Track_number = string(trackNumberRune)
-
-		for index := range orderStruct.Items {
-			orderStruct.Items[index].Rid = uuid.New()
-			orderStruct.Items[index].Track_number = orderStruct.Track_number
-		}
-		orderJson, err = json.Marshal(orderStruct)
-		if err != nil {
-			log.Printf("Ошибка форматирования обновленных данных обратно из струкруры в json из файла model.json: %v\n", err)
+		// Проверяем отмену контекста перед каждой итерацией
+		select {
+		case <-ctx.Done():
+			log.Println("Producer: контекст отменён, завершение работы")
 			return
+		default:
 		}
 
-		err = writer.WriteMessages(ctx, kafka.Message{
-			Value: orderJson,
-		})
+		msgStruct := orderStruct
+		msgStruct.Order_uid = uuid.New()
+		msgStruct.Payment.Transaction = msgStruct.Order_uid
+		msgStruct.Delivery_uid = uuid.New()
+		msgStruct.Delivery.Uid = msgStruct.Delivery_uid
 
+		// Защитная проверка длины Track_number
+		if len(msgStruct.Track_number) > 2 {
+			randomIndex := rand.Intn(len(msgStruct.Track_number))
+			randomNumber := rune(rand.Intn(26) + 65)
+			trackNumberRune := []rune(msgStruct.Track_number)
+			trackNumberRune[randomIndex] = randomNumber
+			msgStruct.Track_number = string(trackNumberRune)
+		}
+
+		for i := range msgStruct.Items {
+			msgStruct.Items[i].Rid = uuid.New()
+			msgStruct.Items[i].Track_number = msgStruct.Track_number
+		}
+
+		data, err := json.Marshal(msgStruct)
 		if err != nil {
+			log.Printf("Ошибка маршалинга сообщения: %v\n", err)
+			goto sleepPeriod
+		}
+
+		if err := writer.WriteMessages(ctx, kafka.Message{Value: data}); err != nil {
+			if errors.Is(err, context.Canceled) || ctx.Err() != nil {
+				log.Println("Producer: запись прервана контекстом, завершение работы")
+				return
+			}
 			log.Printf("Ошибка отправки сообщения: %v\n", err)
 		} else {
 			log.Println("Сообщение успешно отправлено!")
 		}
 
-		// Пауза между отправлениями
-		time.Sleep(20 * time.Second)
+	sleepPeriod:
+		select {
+		case <-ctx.Done():
+			log.Println("Producer: контекст отменён, завершение работы")
+			return
+		case <-time.After(20 * time.Second):
+		}
 	}
 }

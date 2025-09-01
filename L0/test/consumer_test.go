@@ -27,14 +27,14 @@ func TestIsValidDataFromKafka(t *testing.T) {
 	)
 
 	// Первый тестовый пример (несоответствие полей ограничению бд)
-	orderJson, err = os.ReadFile("../model.json")
+	orderJson, err = os.ReadFile("../api/model.json")
 	if err != nil {
-		log.Printf("Ошибка чтения данных из файла model.json при unit тестировании: %v\n", err)
+		log.Fatalf("Ошибка чтения данных из файла model.json при unit тестировании: %v\n", err)
 		return
 	}
 	err = json.Unmarshal(orderJson, &orderStruct)
 	if err != nil {
-		log.Printf("Ошибка форматирования данных из json в струкруру из файла model.json при unit тестировании: %v\n", err)
+		log.Fatalf("Ошибка форматирования данных из json в струкруру из файла model.json при unit тестировании: %v\n", err)
 		return
 	}
 	orderStruct.Locale = "12345678910"
@@ -43,15 +43,15 @@ func TestIsValidDataFromKafka(t *testing.T) {
 	orderStruct.Delivery_uid = uuid.Nil
 	orderJson, err = json.Marshal(orderStruct)
 	if err != nil {
-		log.Printf("Ошибка форматирования данных из струкруры в json при unit тестировании: %v\n", err)
+		log.Fatalf("Ошибка форматирования данных из струкруры в json при unit тестировании: %v\n", err)
 		return
 	}
 	testTable = append(testTable, testInputData{orderJson, false})
 
 	// Второй тестовый пример (json корректен)
-	orderJson, err = os.ReadFile("../model.json")
+	orderJson, err = os.ReadFile("../api/model.json")
 	if err != nil {
-		log.Printf("Ошибка чтения данных из файла model.json при unit тестировании: %v\n", err)
+		log.Fatalf("Ошибка чтения данных из файла model.json при unit тестировании: %v\n", err)
 		return
 	}
 	testTable = append(testTable, testInputData{orderJson, true})
