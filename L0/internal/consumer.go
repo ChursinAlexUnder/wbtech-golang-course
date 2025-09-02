@@ -103,6 +103,14 @@ func Consumer(ctx context.Context, pool *pgxpool.Pool, cache *expirable.LRU[uuid
 		log.Printf("Новая запись успешно вставлена в бд! Её order_uid: %s\n", order.Order_uid)
 
 		// Обновляем кэш
+		for cache.Len() >= 100 {
+			if _, _, ok := cache.RemoveOldest(); ok {
+				log.Println("Consumer: кеш успешно очищен")
+			} else {
+				log.Println("Consumer: не удалось очистить кеш")
+				time.Sleep(time.Second)
+			}
+		}
 		cache.Add(order.Order_uid, order)
 		log.Printf("Новая запись успешно добавлена в кеш! Её order_uid: %s\n", order.Order_uid)
 
