@@ -48,7 +48,7 @@ func NewHTTPError(ctx *gin.Context, status int, err error) {
 // @Failure      500  {object}  HTTPError
 // @Router       /order [get]
 func (c *Controller) GetMainPage(ctx *gin.Context) {
-	ctx.File(filepath.Join("frontend", "index.html"))
+	ctx.File(filepath.Join("web", "index.html"))
 }
 
 // @Summary      Отправка информации о заказе

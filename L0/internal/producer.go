@@ -6,70 +6,13 @@ import (
 	"errors"
 	"log"
 	"math/rand"
-	"net"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/ChursinAlexUnder/wbtech-golang-course/L0/internal/database"
 	"github.com/google/uuid"
 	"github.com/segmentio/kafka-go"
 )
-
-// Функция для создания topic по переданным параметрам
-func createCustomTopic(topic string, partitions, replicationFactor int) error {
-	conn, err := kafka.Dial("tcp", "kafka:9093")
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	controller, err := conn.Controller()
-	if err != nil {
-		return err
-	}
-	var controllerConn *kafka.Conn
-	controllerConn, err = kafka.Dial("tcp", net.JoinHostPort(controller.Host, strconv.Itoa(controller.Port)))
-	if err != nil {
-		return err
-	}
-	defer controllerConn.Close()
-
-	topicConfigs := []kafka.TopicConfig{
-		{
-			Topic:             topic,
-			NumPartitions:     partitions,
-			ReplicationFactor: replicationFactor,
-		},
-	}
-
-	err = controllerConn.CreateTopics(topicConfigs...)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// Функция для получения списка имеющихся topic-ов
-func takeListTopics() (map[string]struct{}, error) {
-	conn, err := kafka.Dial("tcp", "kafka:9093")
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-
-	partitions, err := conn.ReadPartitions()
-	if err != nil {
-		return nil, err
-	}
-
-	m := map[string]struct{}{}
-
-	for _, p := range partitions {
-		m[p.Topic] = struct{}{}
-	}
-	return m, nil
-}
 
 // Основная функция работы producer
 func Producer(ctx context.Context, topic string, partitions, replicationFactor int) {
